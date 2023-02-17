@@ -1,0 +1,26 @@
+{
+  "name": "movies-explorer-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "npx eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/irinpingvin/movies-explorer-api.git"
+  },
+  "author": "Irina Alyabeva",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/irinpingvin/movies-explorer-api/issues"
+  },
+  "homepage": "https://github.com/irinpingvin/movies-explorer-api#readme",
+  "devDependencies": {
+    "eslint": "^8.34.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5"
+  }
+}
