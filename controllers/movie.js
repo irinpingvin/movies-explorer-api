@@ -1,5 +1,6 @@
 const Movie = require('../models/movie');
 const ValidationError = require('../errors/ValidationError');
+const NotFoundError = require('../errors/NotFoundError');
 
 function getSavedMovies(req, res, next) {
   Movie.find({ owner: req.user._id })
@@ -37,4 +38,17 @@ function addMovie(req, res, next) {
     .catch(next);
 }
 
-module.exports = { getSavedMovies, addMovie };
+function deleteMovie(req, res, next) {
+  Movie.findById(req.params._id)
+    .then((movie) => {
+      if (!movie) {
+        throw new NotFoundError('Запрашиваемый фильм не найден');
+      } else {
+        Movie.findByIdAndRemove(req.params._id)
+          .then(() => res.send(movie));
+      }
+    })
+    .catch(next);
+}
+
+module.exports = { getSavedMovies, addMovie, deleteMovie };
