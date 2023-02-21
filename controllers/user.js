@@ -1,7 +1,11 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const ValidationError = require('../errors/ValidationError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 function getUser(req, res, next) {
   User.findById(req.user._id)
@@ -55,4 +59,25 @@ function signup(req, res, next) {
     .catch(next);
 }
 
-module.exports = { getUser, updateUser, signup };
+function signin(req, res, next) {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+      res.cookie('jwt', token, {
+        maxAge: 604800000,
+        httpOnly: true,
+      });
+
+      res.send(token);
+    })
+    .catch(() => {
+      throw new UnauthorizedError('Неверная почта или пароль');
+    })
+    .catch(next);
+}
+
+module.exports = {
+  getUser, updateUser, signup, signin,
+};

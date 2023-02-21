@@ -3,7 +3,7 @@ const { celebrate, Joi } = require('celebrate');
 const userRouter = require('./user');
 const movieRouter = require('./movie');
 const auth = require('../middlewares/auth');
-const { signup } = require('../controllers/user');
+const { signup, signin } = require('../controllers/user');
 
 router.post('/signup', celebrate({
   body: Joi.object().keys({
@@ -12,6 +12,13 @@ router.post('/signup', celebrate({
     password: Joi.string().required(),
   }),
 }), signup);
+
+router.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), signin);
 
 router.use(auth);
 router.use('/', userRouter);
