@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const errorHandler = require('./middlewares/errorHandler');
 const router = require('./routes/routes');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000, MONGOOSE_URL, NODE_ENV } = process.env;
 
@@ -16,7 +17,11 @@ app.use(express.urlencoded({ extended: true }));
 
 mongoose.connect(NODE_ENV === 'production' ? MONGOOSE_URL : 'mongodb://localhost:27017/moviesdb');
 
+app.use(requestLogger);
+
 app.use('/', router);
+
+app.use(errorLogger);
 
 app.use(errors());
 
