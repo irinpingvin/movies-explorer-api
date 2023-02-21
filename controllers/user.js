@@ -78,6 +78,11 @@ function signin(req, res, next) {
     .catch(next);
 }
 
+function signout(req, res) {
+  res.clearCookie('jwt', { httpOnly: true });
+  res.send({ message: 'Вы вышли из учетной записи' });
+}
+
 module.exports = {
-  getUser, updateUser, signup, signin,
+  getUser, updateUser, signup, signin, signout,
 };
