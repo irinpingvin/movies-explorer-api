@@ -29,11 +29,15 @@ function updateUser(req, res, next) {
         res.send({ name: user.name, email: user.email });
       }
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
+    .catch((e) => {
+      if (e.code === 11000) {
+        const err = new Error('Пользователь с таким email уже существует');
+        err.statusCode = 409;
+        next(err);
+      } else if (e.name === 'ValidationError') {
         throw new ValidationError('Переданы некорректные данные в запросе');
       } else {
-        next(err);
+        next(e);
       }
     })
     .catch(next);

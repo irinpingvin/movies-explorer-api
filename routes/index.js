@@ -26,6 +26,6 @@ router.use('/', userRouter);
 router.use('/', movieRouter);
 router.post('/signout', signout);
 
-router.use('*', (_, __, next) => { next(new NotFoundError('запрашиваемый url не найден')); });
+router.use('*', (_, __, next) => { next(new NotFoundError('Запрашиваемый url не найден')); });
 
 module.exports = router;
