@@ -3,7 +3,14 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const ValidationError = require('../errors/ValidationError');
-const UnauthorizedError = require('../errors/UnauthorizedError');
+const ConflictError = require('../errors/ConflictError');
+const {
+  notFoundUserErrorMessage,
+  duplicateEmailErrorMessage,
+  incorrectDataErrorMessage,
+  signoutMessage,
+  validationError,
+} = require('../utils/constants');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -11,7 +18,7 @@ function getUser(req, res, next) {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
+        throw new NotFoundError(notFoundUserErrorMessage);
       } else {
         res.send({ name: user.name, email: user.email });
       }
@@ -24,23 +31,20 @@ function updateUser(req, res, next) {
   User.findByIdAndUpdate(req.user._id, { email, name }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
+        throw new NotFoundError(notFoundUserErrorMessage);
       } else {
         res.send({ name: user.name, email: user.email });
       }
     })
     .catch((e) => {
       if (e.code === 11000) {
-        const err = new Error('Пользователь с таким email уже существует');
-        err.statusCode = 409;
-        next(err);
-      } else if (e.name === 'ValidationError') {
-        throw new ValidationError('Переданы некорректные данные в запросе');
+        next(new ConflictError(duplicateEmailErrorMessage));
+      } else if (e.name === validationError) {
+        next(ValidationError(incorrectDataErrorMessage));
       } else {
         next(e);
       }
-    })
-    .catch(next);
+    });
 }
 
 function signup(req, res, next) {
@@ -51,16 +55,13 @@ function signup(req, res, next) {
     .then((user) => res.send({ name: user.name, email: user.email, _id: user._id }))
     .catch((e) => {
       if (e.code === 11000) {
-        const err = new Error('Пользователь с таким email уже существует');
-        err.statusCode = 409;
-        next(err);
-      } else if (e.name === 'ValidationError') {
-        throw new ValidationError(e.message.replace('user validation failed: ', ''));
+        next(new ConflictError(duplicateEmailErrorMessage));
+      } else if (e.name === validationError) {
+        next(ValidationError(e.message.replace('user validation failed: ', '')));
       } else {
         next(e);
       }
-    })
-    .catch(next);
+    });
 }
 
 function signin(req, res, next) {
@@ -73,18 +74,14 @@ function signin(req, res, next) {
         maxAge: 604800000,
         httpOnly: true,
       });
-
-      res.send(token);
-    })
-    .catch(() => {
-      throw new UnauthorizedError('Неверная почта или пароль');
+      res.send({ token });
     })
     .catch(next);
 }
 
 function signout(req, res) {
   res.clearCookie('jwt', { httpOnly: true });
-  res.send({ message: 'Вы вышли из учетной записи' });
+  res.send({ message: signoutMessage });
 }
 
 module.exports = {

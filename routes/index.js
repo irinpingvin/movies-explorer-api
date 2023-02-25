@@ -1,31 +1,21 @@
 const router = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
 const userRouter = require('./user');
 const movieRouter = require('./movie');
 const auth = require('../middlewares/auth');
 const { signup, signin, signout } = require('../controllers/user');
 const NotFoundError = require('../errors/NotFoundError');
+const { validateSignup, validateSignin } = require('../utils/validation');
+const { notFoundUrlErrorMessage } = require('../utils/constants');
 
-router.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), signup);
+router.post('/signup', validateSignup, signup);
 
-router.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), signin);
+router.post('/signin', validateSignin, signin);
 
 router.use(auth);
 router.use('/', userRouter);
 router.use('/', movieRouter);
 router.post('/signout', signout);
 
-router.use('*', (_, __, next) => { next(new NotFoundError('Запрашиваемый url не найден')); });
+router.use('*', (_, __, next) => { next(new NotFoundError(notFoundUrlErrorMessage)); });
 
 module.exports = router;
