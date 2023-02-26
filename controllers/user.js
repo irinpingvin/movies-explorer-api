@@ -40,7 +40,7 @@ function updateUser(req, res, next) {
       if (e.code === 11000) {
         next(new ConflictError(duplicateEmailErrorMessage));
       } else if (e.name === validationError) {
-        next(ValidationError(incorrectDataErrorMessage));
+        next(new ValidationError(incorrectDataErrorMessage));
       } else {
         next(e);
       }
@@ -57,7 +57,7 @@ function signup(req, res, next) {
       if (e.code === 11000) {
         next(new ConflictError(duplicateEmailErrorMessage));
       } else if (e.name === validationError) {
-        next(ValidationError(e.message.replace('user validation failed: ', '')));
+        next(new ValidationError(e.message.replace('user validation failed: ', '')));
       } else {
         next(e);
       }

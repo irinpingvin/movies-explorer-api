@@ -15,7 +15,7 @@ function addMovie(req, res, next) {
     .then((movie) => res.send(movie))
     .catch((err) => {
       if (err.name === validationError) {
-        next(ValidationError(err.message.replace('movie validation failed: ', '')));
+        next(new ValidationError(err.message.replace('movie validation failed: ', '')));
       } else {
         next(err);
       }
