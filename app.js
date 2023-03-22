@@ -9,6 +9,7 @@ const router = require('./routes');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const limiter = require('./middlewares/rateLimiter');
 const { DEV_MONGOOSE_URL } = require('./utils/dbconfig');
+const corsValidation = require('./middlewares/corsValidation');
 
 const { PORT = 3000, MONGOOSE_URL, NODE_ENV } = process.env;
 
@@ -17,6 +18,7 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(corsValidation);
 app.use(requestLogger);
 app.use(helmet());
 app.use(limiter);
