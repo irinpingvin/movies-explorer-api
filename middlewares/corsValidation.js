@@ -1,6 +1,6 @@
 const allowedCors = [
-  'https://mesto.irinpingviiin.nomoredomainsclub.ru',
-  'http://mesto.irinpingviiin.nomoredomainsclub.ru',
+  'https://movies-explr.alyabeva.nomoredomains.work',
+  'http://movies-explr.alyabeva.nomoredomains.work',
   'http://localhost:3000',
 ];
 
